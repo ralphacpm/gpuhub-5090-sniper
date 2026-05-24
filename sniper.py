@@ -217,7 +217,20 @@ def main():
                         cuda_min=args.cuda_min,
                     )
                     print(f"[{ts()}] Deployment created: {uuid}")
-                    print(f"[{ts()}] Done.")
+                    print(f"")
+                    print(f"  *** ACTION REQUIRED ***")
+                    print(f"  RTX 5090 requires a Duration Package — go to the dashboard NOW:")
+                    print(f"  https://www.gpuhub.com/deploy/elastic/{uuid}")
+                    print(f"  Click 'Purchase Duration Package' before the container is killed.")
+                    print(f"")
+                    print(f"[{ts()}] Waiting 5 minutes for you to purchase the package (Ctrl+C to exit early)...")
+                    try:
+                        for remaining in range(300, 0, -1):
+                            print(f"  {remaining}s remaining...    ", end="\r", flush=True)
+                            time.sleep(1)
+                    except KeyboardInterrupt:
+                        pass
+                    print(f"\n[{ts()}] Done.")
                     return
             else:
                 status_parts = []
