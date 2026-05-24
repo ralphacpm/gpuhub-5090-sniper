@@ -19,6 +19,7 @@ import json
 import os
 import sys
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 
 import requests
@@ -72,14 +73,17 @@ def check_stock(region: str) -> int:
 
 
 def poll_all_regions(regions: list[str]) -> dict[str, int]:
-    """Returns {region: idle_count} for every requested region."""
+    """Checks all regions in parallel and returns {region: idle_count}."""
     result = {}
-    for region in regions:
-        try:
-            result[region] = check_stock(region)
-        except Exception as e:
-            result[region] = -1  # -1 = error
-            print(f"\n[{ts()}] Warning: failed to check {region}: {e}")
+    with ThreadPoolExecutor(max_workers=len(regions)) as executor:
+        futures = {executor.submit(check_stock, region): region for region in regions}
+        for future in as_completed(futures):
+            region = futures[future]
+            try:
+                result[region] = future.result()
+            except Exception as e:
+                result[region] = -1
+                print(f"\n[{ts()}] Warning: failed to check {region}: {e}")
     return result
 
 
