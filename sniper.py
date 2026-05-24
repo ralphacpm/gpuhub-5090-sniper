@@ -23,12 +23,19 @@ from datetime import datetime
 
 import requests
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass  # dotenv optional; fall back to shell env
+
 API_BASE = "https://api.gpuhub.com"
 API_KEY = os.environ.get("GPUHUB_API_KEY", "")
 
 if not API_KEY:
-    print("Error: GPUHUB_API_KEY environment variable is not set.")
-    print("  export GPUHUB_API_KEY=your_token_here")
+    print("Error: GPUHUB_API_KEY is not set.")
+    print("  Option 1: export GPUHUB_API_KEY=your_token_here")
+    print("  Option 2: put GPUHUB_API_KEY=your_token_here in a .env file")
     sys.exit(1)
 
 HEADERS = {
